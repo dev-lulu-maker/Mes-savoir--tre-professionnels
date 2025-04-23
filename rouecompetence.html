@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roue-competence</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <!-- <link rel="stylesheet" href="../media/css/style.css"> -->
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 40px;
+        }
+
+        .question {
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .option {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .score-question {
+            margin-top: 8px;
+            color: green;
+            font-weight: bold;
+        }
+
+        canvas {
+            max-width: 1000px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-dark navbar-dark sticky-top">
+        <div class="container">
+            <a href="" class="navbar-brand">Dev-web</a>
+        </div>
+    </nav>
+    <div class="container py-5">
+        <h2 class="text-light text-center bg-primary rounded py-3">Roue-competence</h2>
+
+
+        <form id="quizForm"></form>
+    </div>
+
+    <div class="text-center">
+        <p><strong>Score total :</strong> <span id="scoreDisplay">0</span> / 64</p>
+
+        <canvas id="roseChart"></canvas>
+    </div>
+
+    <div class="mx-auto" style="width: 35%;">
+        <button id="saveBtn" class="btn btn-primary btn-ms">enregistre la
+            resultat</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // 每题的相同选项
+        const options = [
+            "Je connais cette compétence",
+            "Je connais précisément ce qu'elle implique",
+            "Je connais la définition de cette qualité professionnelle",
+            "J'ai conscience de l'importance de cette qualité professionnelle pour ma cible professionnelle",
+            "J'ai conscience de l'importance de développer cette qualité professionnelle",
+            "Je m'efforce à la développer dans ma vie personnelle et professionnelle",
+            "Je dispose de cette compétence, je la mobiliseen situation professionnelle",
+            "Je peux donner quelques exemples d'illustration"
+        ];
+
+        // 16个问题
+        const questions = {
+            q1: "1. Être à l'écoute",
+            q2: "2. Faire preuve de curiosité",
+            q3: "3. Faire preuve de leadership",
+            q4: "4. Faire preuve de réactivité",
+            q5: "5. Organiser son travail selon les priorités et les objectifs",
+            q6: "6. Travailler en équipe",
+            q7: "7. Faire preuve d'autonomie",
+            q8: "8. S'adapter aux changements",
+            q9: "9. Prendre des initiatives et être force de proposition",
+            q10: "10. Gérer son stress",
+            q11: "11. Faire preuve de persévérance",
+            q12: "12. Faire preuve de rigueur et de précision",
+            q13: "13. Inspirer, donner du sens",
+            q14: "14. Avoir le sens du service",
+            q15: "15. Respecter ses engagements, assumer ses reponsabilités",
+            q16: "16. Faire preuve de créativité, d'inventivité",
+        };
+
+        const form = document.getElementById("quizForm");
+        const scoreDisplay = document.getElementById("scoreDisplay");
+
+        let perQuestionScore = Array(16).fill(0);
+
+        // 创建每题内容
+        let i = 0;
+        for (let key in questions) {
+            const div = document.createElement("div");
+            div.className = "question border rounded m-5 p-5 bg-secondary-subtle";
+            div.id = `container-${key}`;
+
+            const p = document.createElement("p");
+            p.textContent = questions[key];
+            p.className = "text-light bg-dark border rounded p-2";
+            div.appendChild(p);
+
+            options.forEach((option, index) => {
+                const label = document.createElement("label");
+                label.className = "option";
+                label.innerHTML = `<input type="checkbox" name="${key}" value="option${index + 1}"> ${option}`;
+                div.appendChild(label);
+            });
+
+            const scoreP = document.createElement("p");
+            scoreP.className = "score-question";
+            scoreP.id = `score-${key}`;
+            scoreP.textContent = "Score : 0";
+            div.appendChild(scoreP);
+
+            form.appendChild(div);
+            i++;
+        }
+
+        // 初始化图表
+        const ctx = document.getElementById('roseChart').getContext('2d');
+        const roseChart = new Chart(ctx, {
+            type: 'polarArea',
+            data: {
+                // labels: Object.keys(questions).map((q, idx) => `Q${idx + 1}`),
+                labels: Object.values(questions),
+
+                datasets: [{
+                    label: 'score',
+                    data: perQuestionScore,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                        '#9966FF', '#FF9F40', '#8BC34A', '#E91E63',
+                        '#FFD54F', '#81D4FA', '#CE93D8', '#B0BEC5',
+                        '#FF8A65', '#AED581', '#9575CD', '#F06292'
+                    ],
+                    borderRadius: 10  // ✅ 添加圆角半径（单位 px）
+                }]
+            },
+            options: {
+                scales: {
+                    r: {
+                        max: 4,
+                        min: 0,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                },
+                responsive: true,
+                animation: {
+                    animateRotate: true,     // 启用旋转动画
+                    animateScale: true,      // 启用缩放动画
+                    duration: 1200,          // 动画持续时间（毫秒）
+                    // easing: 'easeOutBounce'  动画缓动类型（可选）
+                    easing: 'easeInOutQuad'
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'score:(0.5 point/4)'
+                    }
+                }
+            }
+        });
+
+
+
+
+        // 监听变化，更新得分与图表
+        form.addEventListener("change", () => {
+
+            let totalScore = 0;
+            perQuestionScore = [];
+
+            let i = 0;
+            for (let key in questions) {
+                const checkboxes = document.querySelectorAll(`input[name="${key}"]:checked`);
+                const score = checkboxes.length * 0.5;
+                perQuestionScore[i] = score;
+                totalScore += score;
+
+                const scoreElement = document.getElementById(`score-${key}`);
+                scoreElement.textContent = `score:${score}`;
+                i++;
+            }
+
+            scoreDisplay.textContent = totalScore;
+            roseChart.data.datasets[0].data = perQuestionScore;
+            roseChart.update();
+        });
+        // 点击按钮即可下载文本文件
+        // 保存 PDF（含图表）
+        document.getElementById("saveBtn").addEventListener("click", async () => {
+            const questionList = Object.values(questions);
+            let content = " Résultats de l'auto-évaluation\n\n";
+
+            perQuestionScore.forEach((score, idx) => {
+                content += `${questionList[idx]}:${score} / 4\n`;
+            });
+
+            const totalScore = perQuestionScore.reduce((a, b) => a + b, 0);
+            content += `\n Score total:${totalScore} / 64\n`;
+
+            const proceed = window.confirm("Voici un aperçu :\n\n" + content + "\n\nExporter en tant que PDF?");
+            if (!proceed) return;
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const lines = content.split("\n");
+
+            let y = 10;
+            lines.forEach(line => {
+                doc.text(line, 10, y);
+                y += 8;
+            });
+
+            // 图表截图
+            const canvas = document.getElementById('roseChart');
+            await html2canvas(canvas).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+
+                // 原始尺寸
+                const originalWidth = canvas.width;
+                const originalHeight = canvas.height;
+
+                // 想要的 PDF 图宽度（不要太大）
+                const pdfImgWidth = 180;
+                const pdfImgHeight = (originalHeight / originalWidth) * pdfImgWidth;
+
+                const x = (doc.internal.pageSize.getWidth() - pdfImgWidth) / 2; // 居中
+                // 插入图表图片，保持原始比例
+                doc.addPage();
+                doc.text(" Affichage graphique:", 10, 15);
+                doc.addImage(imgData, 'PNG', 10, 25, pdfImgWidth, pdfImgHeight);
+            });
+
+            const date = new Date();
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            doc.save(`Résultats de l'auto-évaluation-${dateStr}.pdf`);
+        });
+
+    </script>
+
+</body>
+
+</html>
+</body>
+
+</html>
