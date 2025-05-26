@@ -1,0 +1,86 @@
+Technologies & Langages
+HTML (HyperText Markup Language) – langage de balisage
+
+CSS (Cascading Style Sheets) – feuilles de style en cascade
+
+JavaScript – langage de script côté client
+
+Framework – cadre de développement
+
+Library – bibliothèque
+
+Backend / Frontend – arrière-plan / interface
+
+Database – base de données
+
+API (Application Programming Interface) – interface de programmation d'application
+
+Server / Client – serveur / client
+
+🛠️ Outils & Environnement
+IDE (Integrated Development Environment) – environnement de développement
+
+Text editor – éditeur de texte
+
+Version control – contrôle de version
+
+Git / GitHub / GitLab – systèmes de gestion de version
+
+Terminal / Command line – terminal / ligne de commande
+
+Package manager – gestionnaire de paquets (ex: npm, yarn)
+
+🧩 Développement
+Variable – variable
+
+Function / Method – fonction / méthode
+
+Loop – boucle
+
+Condition / If statement – condition
+
+Array / Object – tableau / objet
+
+Class – classe
+
+Component – composant (surtout en React)
+
+🌐 Web & Réseau
+URL (Uniform Resource Locator) – lien / adresse
+
+HTTP / HTTPS – protocoles web
+
+Request / Response – requête / réponse
+
+Cookie / Session – cookie / session
+
+Authentication / Authorization – authentification / autorisation
+
+Routing – routage
+
+📦 Déploiement & Production
+Hosting – hébergement
+
+Deployment – déploiement
+
+Build – construction / compilation
+
+Bug / Debug / Fix – bug / déboguer / corriger
+
+Error / Issue – erreur / problème
+
+Testing / Unit test / Integration test – tests / tests unitaires / tests d'intégration
+
+🗂️ Autres termes utiles
+Responsive design – design adaptatif
+
+User Interface (UI) – interface utilisateur
+
+User Experience (UX) – expérience utilisateur
+
+Layout – disposition
+
+Performance – performance
+
+Accessibility – accessibilité
+
